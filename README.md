@@ -12,8 +12,20 @@ The website can be accessed at https://automationintesting.online/.
 
 The Swagger documentation for the two endpoints you will be testing can be found at:
 
-Booking endpoint: https://automationintesting.online/booking/swagger-ui/index.html
+Booking endpoint: https://automationintesting.online/booking/swagger-ui/index.html  
 Optionally, you also have the Authentican endpoint: https://automationintesting.online/auth/swagger-ui/index.html
+
+### Swagger
+This website is an external application which is not in our control.  
+We noticed that the Swagger documentation is sometimes not available on the mentioned URL above.  
+As a backup, you can find the Swagger documentation in this repository at [src/test/resources/spec/booking.yaml](src/test/resources/spec/booking.yaml)
+
+The Open API Spec file is only supported in the Ultimate version of IntelliJ IDEA. But you can copy the content of the file and paste it in an online Swagger editor like https://editor.swagger.io/ to visualize the API documentation.
+
+### Authentication
+In order to authenticate yourself, the required credentials are:
+* Username: `admin`
+* Password: `password`
 
 ## Task
 You are provided with an extremely basic API test project.
