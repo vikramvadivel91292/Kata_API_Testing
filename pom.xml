@@ -12,6 +12,15 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <cucumber.version>7.22.2</cucumber.version>
+        <rest-assured.version>5.5.2</rest-assured.version>
+        <json-schema-validator.version>5.5.5</json-schema-validator.version>
+        <jackson.version>2.17.2</jackson.version>
+        <lombok.version>1.18.38</lombok.version>
+        <testng.version>7.10.2</testng.version>
+        <jsonassert.version>1.5.1</jsonassert.version>
+        <slf4j-simple.version>2.0.17</slf4j-simple.version>
+        <maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
     </properties>
 
     <dependencies>
@@ -19,23 +28,18 @@
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-java</artifactId>
-            <version>7.22.2</version>
+            <version>${cucumber.version}</version>
         </dependency>
         <dependency>
             <groupId>io.cucumber</groupId>
-            <artifactId>cucumber-junit</artifactId>
-            <version>7.22.2</version>
-        </dependency>
-        <dependency>
-            <groupId>io.cucumber</groupId>
-            <artifactId>cucumber-junit-platform-engine</artifactId>
-            <version>7.22.2</version>
+            <artifactId>cucumber-testng</artifactId>
+            <version>${cucumber.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-suite</artifactId>
-            <version>1.12.2</version>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-picocontainer</artifactId>
+            <version>${cucumber.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -43,17 +47,75 @@
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
-            <version>5.5.2</version>
+            <version>${rest-assured.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>json-schema-validator</artifactId>
+            <version>${json-schema-validator.version}</version>
             <scope>test</scope>
         </dependency>
 
-        <!-- JUnit 5 Dependency -->
+        <!-- Jackson Dependency -->
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>5.12.2</version>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
+        <!-- Lombok Dependency -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- TestNG Dependency -->
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>${testng.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- JSONAssert Dependency -->
+        <dependency>
+            <groupId>org.skyscreamer</groupId>
+            <artifactId>jsonassert</artifactId>
+            <version>${jsonassert.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- SLF4J Simple Provider Dependency -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j-simple.version}</version>
+        </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Surefire plugin to run JUnit 5 tests -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+                <configuration>
+                    <includes>
+                        <include>**/*Test.java</include>
+                        <include>**/*Tests.java</include>
+                        <include>**/*TestRunner.java</include>
+                    </includes>
+                    <useModulePath>false</useModulePath>
+                    <properties>
+                        <configurationParameters>cucumber.execution.parallel.enabled=false</configurationParameters>
+                    </properties>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
