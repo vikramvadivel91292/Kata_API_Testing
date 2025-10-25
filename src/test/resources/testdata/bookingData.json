@@ -1,0 +1,12 @@
+{
+  "roomid": 14,
+  "firstname": "ABCA",
+  "lastname": "DEFA",
+  "depositpaid": true,
+  "bookingdates": {
+    "checkin": "2025-11-01",
+    "checkout": "2025-11-02"
+  },
+  "email": "abca.defa@example.com",
+  "phone": "12345678902"
+}
