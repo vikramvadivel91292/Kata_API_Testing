@@ -1,0 +1,91 @@
+Few findings related to checkin and checkout fields validations
+
+1. Tried giving checkin and check out with same date.
+
+Request Body:
+{
+  "roomid": 6001,
+  "firstname": "ABC",
+  "lastname": "DEF",
+  "depositpaid": true,
+  "bookingdates": {
+    "checkin": "2025-01-02",
+    "checkout": "2025-01-02"
+  },
+  "email": "abc.def@example.com",
+  "phone": "12345678901"
+}
+
+Expected result:
+400 status code with error message
+
+Actual result:
+409 Conflict with Failed to create booking message
+
+2. Tried giving checkin and check out with past date.
+
+Request Body:
+{
+  "roomid": 200,
+  "firstname": "ABC",
+  "lastname": "DEF",
+  "depositpaid": true,
+  "bookingdates": {
+    "checkin": "2025-01-02",
+    "checkout": "2025-01-03"
+  },
+  "email": "abc.def@example.com",
+  "phone": "12345678901"
+}
+
+Expected result:
+400 status code with error message
+
+Actual result:
+201 created
+
+Response body:
+{
+    "bookingid": 4,
+    "roomid": 200,
+    "firstname": "ABC",
+    "lastname": "DEF",
+    "depositpaid": true,
+    "bookingdates": {
+        "checkin": "2025-01-02",
+        "checkout": "2025-01-03"
+    }
+}
+3. Tried giving checkout before check in date.
+Request Body:
+{
+  "roomid": 6001,
+  "firstname": "ABC",
+  "lastname": "DEF",
+  "depositpaid": true,
+  "bookingdates": {
+    "checkin": "2025-11-05",
+    "checkout": "2025-12-02"
+  },
+  "email": "abc.def@example.com",
+  "phone": "12345678901"
+}
+
+Expected result:
+400 status code with error message
+
+Actual result:
+201 created
+
+Response Body:
+{
+    "bookingid": 5,
+    "roomid": 6001,
+    "firstname": "ABC",
+    "lastname": "DEF",
+    "depositpaid": true,
+    "bookingdates": {
+        "checkin": "2025-11-05",
+        "checkout": "2025-12-02"
+    }
+}

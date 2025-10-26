@@ -15,10 +15,10 @@ Request Body:
   "phone": "12345678900"
 }
 
-Expected Behavior:
+Expected result:
 Error stating deposit should be paid.
 
-Actual Behavior:
+Actual result:
 201 Created
 
 Response Body:

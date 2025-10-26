@@ -14,10 +14,10 @@ Request Body:
   "email": "abc.def@example.com",
   "phone": "12345.67890"
 }
-Expected Behavior:
+Expected result:
 400 status code with error message
 
-Actual Behavior:
+Actual result:
 201 Created
 
 Response Body:
@@ -47,10 +47,10 @@ Request Body;
   "email": "abc.def@example.com",
   "phone": "           "
 }
-Expected Behavior:
+Expected result:
 400 status code with error message
 
-Actual Behavior:
+Actual result:
 201 created
 
 Response Body:
@@ -81,10 +81,10 @@ Request Body:
   "phone": "phonenumber"
 }
 
-Expected Behavior:
+Expected result:
 400 status code with error message
 
-Actual Behavior:
+Actual result:
 201 created
 
 Response Body:

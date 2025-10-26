@@ -1,6 +1,6 @@
 Few findings related to roomid field validations
 
-TestData	        Input	            Expected behavior	                                                Actual behavior
+TestData	        Input	            Expected result	                                                    Actual result
 "roomid": "21"	    String numeric	    400 Bad Request (Since field accepts Integer only)	                201 Created
 "roomid":           Blank               400 Bad Request	(no value)                                          500 Internal Server Error
 "roomid": 100.2     Decimal             400 Bad Request (Since field accepts Integer only)                  201 Created
