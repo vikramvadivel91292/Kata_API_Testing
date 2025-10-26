@@ -35,11 +35,11 @@ public class BookingApi {
                 .header("Authorization", "Bearer " + token)
                 .header("Content-Type", "application/json")
                 .body(request)
+                .log().all()
                 .when()
                 .post("/booking")
                 .then()
                 .log().all()
                 .extract().response();
     }
-
 }
