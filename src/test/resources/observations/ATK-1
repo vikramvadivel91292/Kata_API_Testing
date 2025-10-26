@@ -1,0 +1,17 @@
+Title: Unable to create negative scenario for 409 error validation
+Request Body:
+{
+    "bookingid": 5,
+    "roomid": 6,
+    "firstname": "ABC",
+    "lastname": "DEF",
+    "depositpaid": true,
+    "bookingdates": {
+        "checkin": "2025-11-01",
+        "checkout": "2025-11-02"
+    }
+}
+
+Tried by giving the existing resource details in request, got 409 Conflict "Failed to create booking" in response.
+But after sometime, for same data, able to create a new resource since it is an open api.
+So couldn't able to add this validation in negative test.

@@ -1,0 +1,10 @@
+Title: Few observations related to roomid field validations
+
+TestData	        Input	            Expected behavior	                                                Actual behavior
+"roomid": "21"	    String numeric	    400 Bad Request (Since field accepts Integer only)	                201 Created
+"roomid":           Blank               400 Bad Request	(no value)                                          500 Internal Server Error
+"roomid": 100.2     Decimal             400 Bad Request (Since field accepts Integer only)                  201 Created
+"roomid": 011       Starts with '0'     201 Created                                                         500 Internal Server Error
+"roomid": abc       characters          400 Bad Request (Since field accepts Integer only)                  500 Internal Server Error
+"roomid": @%$       special chars       400 Bad Request (Since field accepts Integer only)                  500 Internal Server Error
+"roomid": A11       Alphanumeric        400 Bad Request (Since field accepts Integer only)                  500 Internal Server Error

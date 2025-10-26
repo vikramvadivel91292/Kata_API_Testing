@@ -1,0 +1,67 @@
+Title: Few observations related to depositpaid field validations
+
+1. Gave false as value:
+Request Body:
+{
+   "roomid": 35,
+   "firstname": "ABC",
+  "lastname": "DEF",
+  "depositpaid": false,
+  "bookingdates": {
+    "checkin": "2025-11-01",
+    "checkout": "2025-11-02"
+  },
+  "email": "abc.def@example.com",
+  "phone": "12345678900"
+}
+
+Expected Behavior:
+Error stating deposit should be paid.
+
+Actual Behavior:
+201 Created
+
+Response Body:
+{
+    "bookingid": 5,
+    "roomid": 35,
+    "firstname": "ABC",
+    "lastname": "DEF",
+    "depositpaid": false,
+    "bookingdates": {
+        "checkin": "2025-11-01",
+        "checkout": "2025-11-02"
+    }
+}
+
+2. Tried with Numeric char type than boolean for depositpaid field,
+server accepts it and changes it to true in response.
+Request Body:
+{
+   "roomid": 36,
+   "firstname": "ABC",
+  "lastname": "DEF",
+  "depositpaid": 123,
+  "bookingdates": {
+    "checkin": "2025-11-01",
+    "checkout": "2025-11-02"
+  },
+  "email": "abc.def@example.com",
+  "phone": "12345678900"
+}
+
+Response Body:
+{
+    "bookingid": 6,
+    "roomid": 36,
+    "firstname": "ABC",
+    "lastname": "DEF",
+    "depositpaid": true,
+    "bookingdates": {
+        "checkin": "2025-11-01",
+        "checkout": "2025-11-02"
+    }
+}
+
+3. if we send true and false as String values("true", "false") in depositpaid field,
+server accepts it and booking is getting created.
