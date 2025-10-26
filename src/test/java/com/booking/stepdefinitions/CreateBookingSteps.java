@@ -6,6 +6,7 @@ import com.booking.pojo.BookingDates;
 import com.booking.pojo.BookingRequest;
 import com.booking.pojo.BookingResponse;
 import com.booking.utils.JsonUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.*;
 import io.restassured.response.Response;
@@ -69,15 +70,18 @@ public class CreateBookingSteps {
     // 🧩 For Negative Scenarios
 
     @When("user send a POST request to create booking with")
-    public void user_send_a_POST_request_to_create_booking_with(DataTable dataTable) {
+    public void user_send_a_POST_request_to_create_booking_with(DataTable dataTable) throws IOException {
         Map<String, String> data = dataTable.asMap(String.class, String.class);
 
         bookingRequest = new BookingRequest();
 
         // Handle complex roomid parsing
         bookingRequest.setRoomidRaw(parseRoomId(data.get("roomid")));
-        bookingRequest.setFirstname(data.get("firstname"));
-        bookingRequest.setLastname(data.get("lastname"));
+        // Handle firstname as Object: string, JSON object, array, number, boolean, etc.
+        String firstnameInput = data.get("firstname");
+        bookingRequest.setFirstnameRaw(parseJsonValue(firstnameInput));
+        String lastnameInput = data.get("lastname");
+        bookingRequest.setLastnameRaw(parseJsonValue(lastnameInput));
 
         // Handle flexible boolean parsing for depositpaid
         bookingRequest.setDepositpaidRaw(parseDeposit(data.get("depositpaid")));
@@ -134,6 +138,7 @@ public class CreateBookingSteps {
             System.out.println("Verified error: " + expected);
         }
     }
+
     private Object parseRoomId(String value) {
         if (isNullOrBlank(value)) return null;
 
@@ -171,6 +176,26 @@ public class CreateBookingSteps {
         } catch (NumberFormatException e) {
             return value; // Keep as string for invalid cases
         }
+    }
+
+    // Helper to parse any JSON-like string into proper Object
+    private Object parseJsonValue(String value) {
+        if (isNullOrBlank(value)) return null;
+
+        value = value.trim();
+
+        // Try parsing JSON
+        if (value.startsWith("{") || value.startsWith("[") || value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false") || value.matches("-?\\d+(\\.\\d+)?")) {
+            try {
+                return new ObjectMapper().readValue(value, Object.class);
+            } catch (IOException e) {
+                // Fallback to string if parsing fails
+                return value;
+            }
+        }
+
+        // Otherwise, treat as normal string
+        return value;
     }
 
     /**

@@ -8,20 +8,19 @@ import lombok.Data;
 public class BookingRequest {
 
     private Object roomid;        // changed from int → Object
-    private String firstname;
-    private String lastname;
+    private Object firstname;
+    private Object lastname;
     private Object depositpaid;   // changed from boolean → Object
     private BookingDates bookingdates;
     private String email;
     private String phone;
 
-    // Optional helpers for valid inputs
-    public void setRoomid(Integer roomid) {
-        this.roomid = roomid;
+    public void setFirstnameRaw(Object obj) {
+        this.firstname = obj;       // for objects like {"value":"John"}
     }
 
-    public void setDepositpaid(Boolean depositpaid) {
-        this.depositpaid = depositpaid;
+    public void setLastnameRaw(Object obj) {
+        this.lastname = obj;       // for objects like {"value":"John"}
     }
 
     // For invalid input types (like strings, booleans, nulls)
