@@ -1,4 +1,4 @@
-Title: Few observations related to depositpaid field validations
+Few findings related to depositpaid field validations
 
 1. Gave false as value:
 Request Body:

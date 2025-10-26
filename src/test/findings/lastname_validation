@@ -1,4 +1,4 @@
-Title: Few observations related to lastname field validations
+Few findings related to lastname field validations
 
 1. Tried giving numbers in lastname field.
 Request Body:
@@ -15,7 +15,7 @@ Request Body:
     "phone": "12345678900"
 }
 Expected Behavior:
-400 error with meaningful message
+400 status code with error message
 
 Actual Behavior:
 201 Created
@@ -48,7 +48,7 @@ Request Body;
   "phone": "12345678900"
 }
 Expected Behavior:
-400 error with meaningful message
+400 status code with error message
 
 Actual Behavior:
 201 created
@@ -82,7 +82,7 @@ Request Body:
 }
 
 Expected Behavior:
-400 error with meaningful message
+400 status code with error message
 
 Actual Behavior:
 201 created
@@ -100,7 +100,7 @@ Response Body:
     }
 }
 
-4. Tried giving special characters in lastname field. It accepts it and booking successful.
+4. Tried giving special characters in lastname field. Server accepts it and booking successful.
 Request Body:
 {
   "roomid": 73,
@@ -128,7 +128,7 @@ Response Body:
     }
 }
 
-5. Tried giving leading and trailing spaces in lastname field. It accepts it and booking successful.
+5. Tried giving leading and trailing spaces in lastname field. Server accepts it and booking successful.
 Request Body:
 {
   "roomid": 74,
@@ -143,7 +143,7 @@ Request Body:
   "phone": "12345678900"
 }
 
-6. Tried giving numbers mixed in lastname field. It accepts it and booking successful.
+6. Tried giving numbers mixed in lastname field. Server accepts it and booking successful.
 Request Body:
 {
   "roomid": 75,
@@ -158,7 +158,7 @@ Request Body:
   "phone": "12345678900"
 }
 
-7. Tried giving symbols only in lastname field. It accepts it and booking successful.
+7. Tried giving symbols only in lastname field. Server accepts it and booking successful.
 Request Body:
 {
   "roomid": 76,

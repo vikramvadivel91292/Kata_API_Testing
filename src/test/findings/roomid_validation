@@ -1,4 +1,4 @@
-Title: Few observations related to roomid field validations
+Few findings related to roomid field validations
 
 TestData	        Input	            Expected behavior	                                                Actual behavior
 "roomid": "21"	    String numeric	    400 Bad Request (Since field accepts Integer only)	                201 Created

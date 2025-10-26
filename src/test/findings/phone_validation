@@ -1,0 +1,155 @@
+Few findings related to  phone field validations
+
+1. Tried giving . in  phone field.
+Request Body:
+{
+  "roomid": 91,
+  "firstname": "ABC",
+  "lastname": "DEF",
+  "depositpaid": true,
+  "bookingdates": {
+    "checkin": "2025-11-01",
+    "checkout": "2025-11-02"
+  },
+  "email": "abc.def@example.com",
+  "phone": "12345.67890"
+}
+Expected Behavior:
+400 status code with error message
+
+Actual Behavior:
+201 Created
+
+Response Body:
+{
+    "bookingid": 5,
+    "roomid": 91,
+    "firstname": "ABC",
+    "lastname": "DEF",
+    "depositpaid": true,
+    "bookingdates": {
+        "checkin": "2025-11-01",
+        "checkout": "2025-11-02"
+    }
+}
+
+2. Tried giving 11 blank spaces in  phone field.
+Request Body;
+{
+  "roomid": 92,
+  "firstname": "ABC",
+  "lastname": "DEF",
+  "depositpaid": true,
+  "bookingdates": {
+    "checkin": "2025-11-01",
+    "checkout": "2025-11-02"
+  },
+  "email": "abc.def@example.com",
+  "phone": "           "
+}
+Expected Behavior:
+400 status code with error message
+
+Actual Behavior:
+201 created
+
+Response Body:
+{
+    "bookingid": 6,
+    "roomid": 92,
+    "firstname": "ABC",
+    "lastname": "DEF",
+    "depositpaid": true,
+    "bookingdates": {
+        "checkin": "2025-11-01",
+        "checkout": "2025-11-02"
+    }
+}
+
+3. Tried giving alphabets in phone field.
+Request Body:
+{
+  "roomid": 93,
+  "firstname": "ABC",
+  "lastname": "DEF",
+  "depositpaid": true,
+  "bookingdates": {
+    "checkin": "2025-11-01",
+    "checkout": "2025-11-02"
+  },
+  "email": "abc.def@example.com",
+  "phone": "phonenumber"
+}
+
+Expected Behavior:
+400 status code with error message
+
+Actual Behavior:
+201 created
+
+Response Body:
+{
+    "bookingid": 7,
+    "roomid": 93,
+    "firstname": "ABC",
+    "lastname": "DEF",
+    "depositpaid": true,
+    "bookingdates": {
+        "checkin": "2025-11-01",
+        "checkout": "2025-11-02"
+    }
+}
+
+4. Tried giving special characters in phone field. Server accepts it and booking successful.
+Request Body:
+{
+  "roomid": 94,
+  "firstname": "ABC",
+  "lastname": "DEF",
+  "depositpaid": true,
+  "bookingdates": {
+    "checkin": "2025-11-01",
+    "checkout": "2025-11-02"
+  },
+  "email": "abc.def@example.com",
+  "phone": "123456789*@"
+}
+
+Response Body:
+{
+    "bookingid": 8,
+    "roomid": 94,
+    "firstname": "ABC",
+    "lastname": "DEF",
+    "depositpaid": true,
+    "bookingdates": {
+        "checkin": "2025-11-01",
+        "checkout": "2025-11-02"
+    }
+}
+
+5. Tried without phone field in payload. Server accepts it and booking successful.
+Request Body:
+{
+  "roomid": 97,
+  "firstname": "ABC",
+  "lastname": "DEF",
+  "depositpaid": true,
+  "bookingdates": {
+    "checkin": "2025-11-01",
+    "checkout": "2025-11-02"
+  },
+  "email": "abc.def@example.com"
+}
+response Body:
+{
+    "bookingid": 4,
+    "roomid": 97,
+    "firstname": "ABC",
+    "lastname": "DEF",
+    "depositpaid": true,
+    "bookingdates": {
+        "checkin": "2025-11-01",
+        "checkout": "2025-11-02"
+    }
+}

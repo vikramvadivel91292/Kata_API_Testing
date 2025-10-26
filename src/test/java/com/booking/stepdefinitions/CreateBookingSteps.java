@@ -67,10 +67,9 @@ public class CreateBookingSteps {
                 + " → "
                 + bookingResponse.getBookingdates().getCheckout());
     }
-    // 🧩 For Negative Scenarios
-
+    // For Negative Scenarios
     @When("user send a POST request to create booking with")
-    public void user_send_a_POST_request_to_create_booking_with(DataTable dataTable) throws IOException {
+    public void user_send_a_POST_request_to_create_booking_with(DataTable dataTable) {
         Map<String, String> data = dataTable.asMap(String.class, String.class);
 
         bookingRequest = new BookingRequest();

@@ -1,4 +1,4 @@
-Title: Few observations related to firstname field validations
+Few findings related to firstname field validations
 
 1. Tried giving numbers in firstname field.
 Request Body:
@@ -15,7 +15,7 @@ Request Body:
     "phone": "12345678900"
 }
 Expected Behavior:
-400 error with meaningful message
+400 status code with error message
 
 Actual Behavior:
 201 Created
@@ -48,7 +48,7 @@ Request Body;
   "phone": "12345678900"
 }
 Expected Behavior:
-400 error with meaningful message
+400 status code with error message
 
 Actual Behavior:
 201 created
@@ -81,7 +81,7 @@ Request Body:
   "phone": "12345678900"
 }
 Expected Behavior:
-400 error with meaningful message
+400 status code with error message
 
 Actual Behavior:
 201 created
@@ -99,7 +99,7 @@ Response Body:
     }
 }
 
-4. Tried giving special characters in firstname field. It accepts it and booking successful.
+4. Tried giving special characters in firstname field. Server accepts it and booking successful.
 Request Body:
 {
   "roomid": 18,
@@ -114,7 +114,7 @@ Request Body:
   "phone": "12345678900"
 }
 
-5. Tried giving leading and trailing spaces in firstname field. It accepts it and booking successful.
+5. Tried giving leading and trailing spaces in firstname field. Server accepts it and booking successful.
 Request Body:
 {
   "roomid": 18,
@@ -129,7 +129,7 @@ Request Body:
   "phone": "12345678900"
 }
 
-6. Tried giving numbers mixed in firstname field. It accepts it and booking successful.
+6. Tried giving numbers mixed in firstname field. Server accepts it and booking successful.
 Request Body:
 {
   "roomid": 19,
@@ -144,7 +144,7 @@ Request Body:
   "phone": "12345678900"
 }
 
-7. Tried giving symbols only in firstname field. It accepts it and booking successful.
+7. Tried giving symbols only in firstname field. Server accepts it and booking successful.
 Request Body:
 {
   "roomid": 20,
