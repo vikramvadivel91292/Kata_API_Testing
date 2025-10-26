@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class CreateBookingSteps {
 
@@ -74,10 +73,14 @@ public class CreateBookingSteps {
         Map<String, String> data = dataTable.asMap(String.class, String.class);
 
         bookingRequest = new BookingRequest();
-        bookingRequest.setRoomid(Integer.parseInt(data.get("roomid")));
+
+        // Handle complex roomid parsing
+        bookingRequest.setRoomidRaw(parseRoomId(data.get("roomid")));
         bookingRequest.setFirstname(data.get("firstname"));
         bookingRequest.setLastname(data.get("lastname"));
-        bookingRequest.setDepositpaid(Boolean.parseBoolean(data.get("depositpaid")));
+
+        // Handle flexible boolean parsing for depositpaid
+        bookingRequest.setDepositpaidRaw(parseDeposit(data.get("depositpaid")));
 
         BookingDates bookingDates = new BookingDates();
         bookingDates.setCheckin(data.get("checkin"));
@@ -88,8 +91,9 @@ public class CreateBookingSteps {
         bookingRequest.setPhone(data.get("phone"));
 
         bookingApi = new BookingApi();
-        response = bookingApi.createBookingRaw(bookingRequest, Hooks.token); // Use method returning Response object
+        response = bookingApi.createBookingRaw(bookingRequest, Hooks.token);
     }
+
 
     @Then("The response status code should be {int}")
     public void the_response_status_code_should_be(Integer expectedStatusCode) {
@@ -130,5 +134,49 @@ public class CreateBookingSteps {
             System.out.println("Verified error: " + expected);
         }
     }
+    private Object parseRoomId(String value) {
+        if (isNullOrBlank(value)) return null;
 
+        try {
+            // Try to parse integer
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e1) {
+            try {
+                // Try to parse decimal (e.g., 11.2)
+                return Double.parseDouble(value);
+            } catch (NumberFormatException e2) {
+                // Handle booleans like true/false
+                if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false")) {
+                    return Boolean.parseBoolean(value);
+                }
+                // Keep invalid strings (e.g., "abc")
+                return value;
+            }
+        }
+    }
+
+    /**
+     * Parse depositpaid — allows true/false, numbers, strings, or invalid data
+     */
+    private Object parseDeposit(String value) {
+        if (isNullOrBlank(value)) return null;
+
+        if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false")) {
+            return Boolean.parseBoolean(value);
+        }
+
+        try {
+            // Handle numeric input like 1, 0, 21
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            return value; // Keep as string for invalid cases
+        }
+    }
+
+    /**
+     * Utility to check for null, empty, or literal "null"
+     */
+    private boolean isNullOrBlank(String value) {
+        return value == null || value.trim().isEmpty() || value.equalsIgnoreCase("null");
+    }
 }
