@@ -2,17 +2,26 @@ package com.booking.stepdefinitions;
 
 import com.booking.hooks.Hooks;
 import com.booking.pages.BookingApi;
+import com.booking.pojo.BookingDates;
 import com.booking.pojo.BookingRequest;
 import com.booking.pojo.BookingResponse;
 import com.booking.utils.JsonUtils;
+import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.*;
+import io.restassured.response.Response;
 import org.testng.Assert;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class CreateBookingSteps {
 
+    private BookingApi bookingApi;
     private BookingRequest bookingRequest;
     private BookingResponse bookingResponse;
+    private Response response;
 
     @Given("user have valid authentication token")
     public void user_have_valid_authentication_token() {
@@ -29,7 +38,7 @@ public class CreateBookingSteps {
 
     @When("user sends POST request to create a booking")
     public void user_sends_POST_request_to_create_a_booking() {
-        BookingApi bookingApi = new BookingApi();
+        bookingApi = new BookingApi();
         bookingResponse = bookingApi.createBooking(bookingRequest, Hooks.token);
     }
 
@@ -58,4 +67,68 @@ public class CreateBookingSteps {
                 + " → "
                 + bookingResponse.getBookingdates().getCheckout());
     }
+    // 🧩 For Negative Scenarios
+
+    @When("user send a POST request to create booking with")
+    public void user_send_a_POST_request_to_create_booking_with(DataTable dataTable) {
+        Map<String, String> data = dataTable.asMap(String.class, String.class);
+
+        bookingRequest = new BookingRequest();
+        bookingRequest.setRoomid(Integer.parseInt(data.get("roomid")));
+        bookingRequest.setFirstname(data.get("firstname"));
+        bookingRequest.setLastname(data.get("lastname"));
+        bookingRequest.setDepositpaid(Boolean.parseBoolean(data.get("depositpaid")));
+
+        BookingDates bookingDates = new BookingDates();
+        bookingDates.setCheckin(data.get("checkin"));
+        bookingDates.setCheckout(data.get("checkout"));
+        bookingRequest.setBookingdates(bookingDates);
+
+        bookingRequest.setEmail(data.get("email"));
+        bookingRequest.setPhone(data.get("phone"));
+
+        bookingApi = new BookingApi();
+        response = bookingApi.createBookingRaw(bookingRequest, Hooks.token); // Use method returning Response object
+    }
+
+    @Then("The response status code should be {int}")
+    public void the_response_status_code_should_be(Integer expectedStatusCode) {
+        Assert.assertEquals(
+                response.getStatusCode(),
+                expectedStatusCode.intValue(),
+                "Unexpected status code! Response: " + response.getBody().asString()
+        );
+        System.out.println("Verified status code: " + expectedStatusCode);
+    }
+
+    @Then("The response should contain error {string}")
+    public void the_response_should_contain_error(String expectedErrors) {
+        // Extract actual errors as List<String> from JSON
+        List<String> actualErrors = response.jsonPath().getList("errors", String.class);
+        Assert.assertNotNull(actualErrors, "'errors' field is missing in response!");
+
+        // Split expected errors (comma-separated from Examples)
+        String[] expectedList = expectedErrors.split(",");
+
+        // Normalize whitespace for safety
+        List<String> expectedTrimmed = Arrays.stream(expectedList)
+                .map(String::trim)
+                .toList();
+
+        System.out.println("🔍 Actual errors: " + actualErrors);
+        System.out.println("🔍 Expected errors: " + expectedTrimmed);
+
+        // Check if all expected errors are present
+        for (String expected : expectedTrimmed) {
+            boolean matchFound = actualErrors.stream()
+                    .anyMatch(actual -> actual.toLowerCase().contains(expected.toLowerCase()));
+
+            Assert.assertTrue(
+                    matchFound,
+                    "Expected error not found!\nMissing: " + expected + "\nActual errors: " + actualErrors
+            );
+            System.out.println("Verified error: " + expected);
+        }
+    }
+
 }

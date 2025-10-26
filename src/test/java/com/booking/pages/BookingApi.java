@@ -5,6 +5,7 @@ import com.booking.pojo.BookingResponse;
 import io.restassured.RestAssured;
 import static io.restassured.RestAssured.given;
 import com.booking.utils.ConfigReader;
+import io.restassured.response.Response;
 
 public class BookingApi {
 
@@ -28,4 +29,17 @@ public class BookingApi {
                 .extract()
                 .as(BookingResponse.class);
     }
+
+    public Response createBookingRaw(BookingRequest request, String token) {
+        return given()
+                .header("Authorization", "Bearer " + token)
+                .header("Content-Type", "application/json")
+                .body(request)
+                .when()
+                .post("/booking")
+                .then()
+                .log().all()
+                .extract().response();
+    }
+
 }
