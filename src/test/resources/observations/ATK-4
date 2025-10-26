@@ -1,0 +1,160 @@
+Title: Few observations related to firstname field validations
+
+1. Tried giving numbers in firstname field.
+Request Body:
+{
+    "roomid": 45,
+    "firstname": 1234,
+    "lastname": "DEF",
+    "depositpaid": true,
+    "bookingdates": {
+        "checkin": "2025-11-01",
+        "checkout": "2025-11-02"
+    },
+    "email": "abc.def@example.com",
+    "phone": "12345678900"
+}
+Expected Behavior:
+400 error with meaningful message
+
+Actual Behavior:
+201 Created
+
+Response Body:
+{
+    "bookingid": 5,
+    "roomid": 45,
+    "firstname": "1234",
+    "lastname": "DEF",
+    "depositpaid": true,
+    "bookingdates": {
+        "checkin": "2025-11-01",
+        "checkout": "2025-11-02"
+    }
+}
+
+2. Tried giving decimal in firstname field.
+Request Body;
+{
+  "roomid": 16,
+  "firstname": 12.34,
+  "lastname": "DEF",
+  "depositpaid": true,
+  "bookingdates": {
+    "checkin": "2025-11-01",
+    "checkout": "2025-11-02"
+  },
+  "email": "abc.def@example.com",
+  "phone": "12345678900"
+}
+Expected Behavior:
+400 error with meaningful message
+
+Actual Behavior:
+201 created
+
+Response Body:
+{
+    "bookingid": 4,
+    "roomid": 16,
+    "firstname": "12.34",
+    "lastname": "DEF",
+    "depositpaid": true,
+    "bookingdates": {
+        "checkin": "2025-11-01",
+        "checkout": "2025-11-02"
+    }
+}
+
+3. Tried giving boolean in firstname field.
+Request Body:
+{
+  "roomid": 17,
+  "firstname": true,
+  "lastname": "DEF",
+  "depositpaid": true,
+  "bookingdates": {
+    "checkin": "2025-11-01",
+    "checkout": "2025-11-02"
+  },
+  "email": "abc.def@example.com",
+  "phone": "12345678900"
+}
+Expected Behavior:
+400 error with meaningful message
+
+Actual Behavior:
+201 created
+
+Response Body:
+{
+    "bookingid": 5,
+    "roomid": 17,
+    "firstname": "true",
+    "lastname": "DEF",
+    "depositpaid": true,
+    "bookingdates": {
+        "checkin": "2025-11-01",
+        "checkout": "2025-11-02"
+    }
+}
+
+4. Tried giving special characters in firstname field. It accepts it and booking successful.
+Request Body:
+{
+  "roomid": 18,
+  "firstname": “ABC@#”,
+  "lastname": "DEF",
+  "depositpaid": true,
+  "bookingdates": {
+    "checkin": "2025-11-01",
+    "checkout": "2025-11-02"
+  },
+  "email": "abc.def@example.com",
+  "phone": "12345678900"
+}
+
+5. Tried giving leading and trailing spaces in firstname field. It accepts it and booking successful.
+Request Body:
+{
+  "roomid": 18,
+  "firstname": " John ",
+  "lastname": "DEF",
+  "depositpaid": true,
+  "bookingdates": {
+    "checkin": "2025-11-01",
+    "checkout": "2025-11-02"
+  },
+  "email": "abc.def@example.com",
+  "phone": "12345678900"
+}
+
+6. Tried giving numbers mixed in firstname field. It accepts it and booking successful.
+Request Body:
+{
+  "roomid": 19,
+  "firstname": "John123",
+  "lastname": "DEF",
+  "depositpaid": true,
+  "bookingdates": {
+    "checkin": "2025-11-01",
+    "checkout": "2025-11-02"
+  },
+  "email": "abc.def@example.com",
+  "phone": "12345678900"
+}
+
+7. Tried giving symbols only in firstname field. It accepts it and booking successful.
+Request Body:
+{
+  "roomid": 20,
+  "firstname": "@#$%",
+  "lastname": "DEF",
+  "depositpaid": true,
+  "bookingdates": {
+    "checkin": "2025-11-01",
+    "checkout": "2025-11-02"
+  },
+  "email": "abc.def@example.com",
+  "phone": "12345678900"
+}
