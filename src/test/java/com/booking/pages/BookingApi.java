@@ -1,7 +1,6 @@
 package com.booking.pages;
 
 import com.booking.pojo.BookingRequest;
-import com.booking.pojo.BookingResponse;
 import io.restassured.RestAssured;
 import static io.restassured.RestAssured.given;
 import com.booking.utils.ConfigReader;
