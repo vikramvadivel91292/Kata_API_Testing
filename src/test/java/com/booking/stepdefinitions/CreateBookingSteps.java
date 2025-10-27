@@ -11,30 +11,39 @@ import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.*;
 import io.restassured.module.jsv.JsonSchemaValidator;
 import io.restassured.response.Response;
+import org.apache.commons.lang3.StringUtils;
 import org.testng.Assert;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class CreateBookingSteps {
+
+    private static final Logger logger = LogManager.getLogger(CreateBookingSteps.class);
 
     private BookingApi bookingApi;
     private BookingRequest bookingRequest;
     private BookingResponse bookingResponse;
     private Response response;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Given("user have valid authentication token")
     public void user_have_valid_authentication_token() {
         Assert.assertNotNull(Hooks.token, "Token should not be null");
-        System.out.println("Auth Token verified: " + Hooks.token);
+        logger.info("Auth Token verified: {}", Hooks.token);
     }
 
     @Given("user have valid booking data")
     public void user_have_valid_booking_data() throws IOException {
         bookingRequest = JsonUtils.loadBookingData("src/test/resources/testdata/bookingData.json");
         Assert.assertNotNull(bookingRequest, "Booking data should be loaded from JSON");
-        System.out.println("Booking data loaded: " + bookingRequest.getFirstname());
+        logger.info("Booking data loaded with firstname: {}", bookingRequest.getFirstname());
     }
 
     @When("user sends POST request to create a booking")
@@ -43,6 +52,7 @@ public class CreateBookingSteps {
         response = bookingApi.createBookingRaw(bookingRequest, Hooks.token);
         // deserialize to POJO for your assertions
         bookingResponse = response.as(BookingResponse.class);
+        logger.debug("POST request sent to create booking");
     }
 
     @Then("user should get valid booking response with status code {int}")
@@ -64,11 +74,10 @@ public class CreateBookingSteps {
                 "Check-out date mismatch"
         );
 
-        System.out.println("Booking successfully created with ID: " + bookingResponse.getBookingid());
-        System.out.println("Check-in/out dates verified: "
-                + bookingResponse.getBookingdates().getCheckin()
-                + " → "
-                + bookingResponse.getBookingdates().getCheckout());
+        logger.info("Booking successfully created with ID: {}", bookingResponse.getBookingid());
+        logger.info("Check-in/out dates verified: {} → {}",
+                bookingResponse.getBookingdates().getCheckin(),
+                bookingResponse.getBookingdates().getCheckout());
 
         // Share booking response with GetBookingSteps
         GetBookingSteps.setBookingResponse(bookingResponse);
@@ -84,7 +93,7 @@ public class CreateBookingSteps {
                 .assertThat()
                 .body(JsonSchemaValidator.matchesJsonSchemaInClasspath("schemes/" + schemaFileName + ".json"));
 
-        System.out.println("Booking response successfully validated against schema: " + schemaFileName + ".json");
+        logger.info("Booking response successfully validated against schema: {}.json", schemaFileName);
     }
 
     // For Negative Scenarios
@@ -115,133 +124,214 @@ public class CreateBookingSteps {
 
         bookingApi = new BookingApi();
         response = bookingApi.createBookingRaw(bookingRequest, Hooks.token);
+        logger.debug("POST request sent with custom booking data");
     }
-
 
     @Then("The response status code should be {int}")
     public void the_response_status_code_should_be(Integer expectedStatusCode) {
+        int actualStatusCode = response.getStatusCode();
         Assert.assertEquals(
-                response.getStatusCode(),
+                actualStatusCode,
                 expectedStatusCode.intValue(),
                 "Unexpected status code! Response: " + response.getBody().asString()
         );
-        System.out.println("Verified status code: " + expectedStatusCode);
+        logger.info("Verified status code: {}", expectedStatusCode);
     }
 
     @Then("The response should contain error {string}")
     public void the_response_should_contain_error(String expectedErrors) {
-        // Extract actual errors as List<String> from JSON
-        List<String> actualErrors = response.jsonPath().getList("errors", String.class);
-        Assert.assertNotNull(actualErrors, "'errors' field is missing in response!");
+        List<String> actualErrors = getActualErrors();
+        List<String> expectedTrimmed = parseExpectedErrors(expectedErrors);
 
-        // Split expected errors (comma-separated from Examples)
-        String[] expectedList = expectedErrors.split(",");
+        logger.debug("Actual errors: {}", actualErrors);
+        logger.debug("Expected errors: {}", expectedTrimmed);
 
-        // Normalize whitespace for safety
-        List<String> expectedTrimmed = Arrays.stream(expectedList)
+        expectedTrimmed.forEach(expected ->
+                assertErrorPresent(actualErrors, expected)
+        );
+    }
+
+    private List<String> getActualErrors() {
+        List<String> errors = response.jsonPath().getList("errors", String.class);
+        Assert.assertNotNull(errors, "'errors' field is missing in response!");
+        return errors;
+    }
+
+    private List<String> parseExpectedErrors(String expectedErrors) {
+        return Arrays.stream(expectedErrors.split(","))
                 .map(String::trim)
                 .toList();
+    }
 
-        System.out.println("Actual errors: " + actualErrors);
-        System.out.println("Expected errors: " + expectedTrimmed);
+    private void assertErrorPresent(List<String> actualErrors, String expected) {
+        boolean matchFound = actualErrors.stream()
+                .anyMatch(actual -> actual.toLowerCase().contains(expected.toLowerCase()));
 
-        // Check if all expected errors are present
-        for (String expected : expectedTrimmed) {
-            boolean matchFound = actualErrors.stream()
-                    .anyMatch(actual -> actual.toLowerCase().contains(expected.toLowerCase()));
+        Assert.assertTrue(
+                matchFound,
+                String.format("Expected error not found! Missing: %s%nActual errors: %s", expected, actualErrors)
+        );
 
-            Assert.assertTrue(
-                    matchFound,
-                    "Expected error not found!\nMissing: " + expected + "\nActual errors: " + actualErrors
-            );
-            System.out.println("Verified error: " + expected);
-        }
+        logger.info("Verified error: {}", expected);
     }
 
     private Object parseRoomId(String value) {
         if (isNullOrBlank(value)) return null;
 
+        String trimmed = value.trim();
+        TypeHandler handler = detectTypeHandler(trimmed);
+        return handler.parse(trimmed);
+    }
+
+    private TypeHandler detectTypeHandler(String value) {
+        return HANDLERS.stream()
+                .filter(h -> h.matches(value))
+                .findFirst()
+                .orElse(TypeHandler.STRING);
+    }
+
+    // ---- Helper structure ----
+
+    private static final List<TypeHandler> HANDLERS = List.of(
+            new TypeHandler("BOOLEAN", v -> v.equalsIgnoreCase("true") || v.equalsIgnoreCase("false"), Boolean::parseBoolean),
+            new TypeHandler("INTEGER", CreateBookingSteps::isParsableInt, Integer::parseInt),
+            new TypeHandler("DOUBLE", CreateBookingSteps::isParsableDouble, Double::parseDouble),
+            TypeHandler.STRING // fallback
+    );
+
+    private static boolean isParsableInt(String v) {
         try {
-            // Try to parse integer
-            return Integer.parseInt(value);
-        } catch (NumberFormatException e1) {
-            try {
-                // Try to parse decimal (e.g., 11.2)
-                return Double.parseDouble(value);
-            } catch (NumberFormatException e2) {
-                // Handle booleans like true/false
-                if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false")) {
-                    return Boolean.parseBoolean(value);
-                }
-                // Keep invalid strings (e.g., "abc")
-                return value;
-            }
+            Integer.parseInt(v);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
         }
     }
 
-    // Parse depositpaid — allows true/false, numbers, strings, or invalid data
+    private static boolean isParsableDouble(String v) {
+        try {
+            Double.parseDouble(v);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    // ---- Inner class ----
+
+    private static class TypeHandler {
+        final String name;
+        final Predicate<String> matcher;
+        final Function<String, Object> parser;
+
+        static final TypeHandler STRING = new TypeHandler("STRING", v -> true, v -> v);
+
+        TypeHandler(String name, Predicate<String> matcher, Function<String, Object> parser) {
+            this.name = name;
+            this.matcher = matcher;
+            this.parser = parser;
+        }
+
+        boolean matches(String value) {
+            return matcher.test(value);
+        }
+
+        Object parse(String value) {
+            return parser.apply(value);
+        }
+    }
+
     private Object parseDeposit(String value) {
         if (isNullOrBlank(value)) return null;
+        return parseValueWithFallback(value);
+    }
 
-        if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false")) {
-            return Boolean.parseBoolean(value);
-        }
+    private Object parseValueWithFallback(String value) {
+        return tryParseBoolean(value)
+                .orElseGet(() -> tryParseInteger(value)
+                        .orElse(value));
+    }
 
+    private Optional<Object> tryParseBoolean(String value) {
+        return "true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value)
+                ? Optional.of(Boolean.parseBoolean(value))
+                : Optional.empty();
+    }
+
+    private Optional<Object> tryParseInteger(String value) {
         try {
-            // Handle numeric input like 1, 0, 21
-            return Integer.parseInt(value);
+            return Optional.of(Integer.parseInt(value));
         } catch (NumberFormatException e) {
-            return value; // Keep as string for invalid cases
+            return Optional.empty();
         }
     }
 
-    // Helper to parse any JSON-like string into proper Object
     private Object parseJsonValue(String value) {
         if (isNullOrBlank(value)) return null;
 
         value = value.trim();
+        return parseJsonIfPossible(value);
+    }
 
-        // Try parsing JSON
-        if (value.startsWith("{") || value.startsWith("[") || value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false") || value.matches("-?\\d+(\\.\\d+)?")) {
-            try {
-                return new ObjectMapper().readValue(value, Object.class);
-            } catch (IOException e) {
-                // Fallback to string if parsing fails
-                return value;
-            }
+    private Object parseJsonIfPossible(String value) {
+        return isJsonLike(value) ? tryParseJson(value).orElse(value) : value;
+    }
+
+    private Optional<Object> tryParseJson(String value) {
+        try {
+            return Optional.of(objectMapper.readValue(value, Object.class));
+        } catch (IOException e) {
+            logger.debug("Failed to parse JSON value: {}, error: {}", value, e.getMessage());
+            return Optional.empty();
         }
+    }
 
-        // Otherwise, treat as normal string
-        return value;
+    private boolean isJsonLike(String value) {
+        return !isNullOrBlank(value) &&
+                (startsWithJsonSymbol(value) || isBooleanOrNumber(value));
+    }
+
+    private boolean startsWithJsonSymbol(String value) {
+        return StringUtils.startsWithAny(value, "{", "[");
+    }
+
+    private boolean isBooleanOrNumber(String value) {
+        return value.equalsIgnoreCase("true")
+                || value.equalsIgnoreCase("false")
+                || value.matches("-?\\d+(\\.\\d+)?");
     }
 
     // Utility to check for null, empty, or literal "null"
     private boolean isNullOrBlank(String value) {
-        return value == null || value.trim().isEmpty() || value.equalsIgnoreCase("null");
+        return StringUtils.isBlank(value) || "null".equalsIgnoreCase(value);
     }
 
     @When("user sends PUT request to update booking ID {int}")
     public void user_sends_PUT_request_to_update_booking_ID(Integer id) {
         bookingApi = new BookingApi();
         response = bookingApi.updateBooking(id, bookingRequest, Hooks.token);
+        logger.debug("PUT request sent to update booking ID: {}", id);
     }
 
     @When("user sends PUT request to update booking ID {int} with token {string}")
     public void user_sends_PUT_request_to_update_booking_ID_with_token(Integer id, String token) {
         bookingApi = new BookingApi();
         response = bookingApi.updateBooking(id, bookingRequest, token);
+        logger.debug("PUT request sent to update booking ID: {} with custom token", id);
     }
 
     @When("user sends PATCH request to partially update booking ID {int}")
     public void user_sends_PATCH_request_to_partially_update_booking_ID(Integer id) {
         bookingApi = new BookingApi();
         response = bookingApi.partialUpdateBooking(id, bookingRequest, Hooks.token);
+        logger.debug("PATCH request sent to partially update booking ID: {}", id);
     }
 
     @When("user sends PATCH request to partially update booking ID {int} with token {string}")
     public void user_sends_PATCH_request_to_partially_update_booking_ID_with_token(Integer id, String token) {
         bookingApi = new BookingApi();
         response = bookingApi.partialUpdateBooking(id, bookingRequest, token);
+        logger.debug("PATCH request sent to partially update booking ID: {} with custom token", id);
     }
 
     @When("user send a PUT request to update booking ID {int} with")
@@ -263,5 +353,6 @@ public class CreateBookingSteps {
 
         bookingApi = new BookingApi();
         response = bookingApi.updateBookingRaw(id, bookingRequest, Hooks.token);
+        logger.debug("PUT request sent to update booking ID: {} with custom data", id);
     }
 }
