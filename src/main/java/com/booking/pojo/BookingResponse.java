@@ -11,4 +11,7 @@ public class BookingResponse {
     private String firstname;
     private String lastname;
     private BookingDates bookingdates;
+    private boolean depositpaid;
+    private String email;
+    private String phone;
 }

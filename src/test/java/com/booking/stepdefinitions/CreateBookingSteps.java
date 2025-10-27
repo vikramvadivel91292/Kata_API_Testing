@@ -66,7 +66,11 @@ public class CreateBookingSteps {
                 + bookingResponse.getBookingdates().getCheckin()
                 + " → "
                 + bookingResponse.getBookingdates().getCheckout());
+
+        // Share booking response with GetBookingSteps
+        GetBookingSteps.setBookingResponse(bookingResponse);
     }
+
     // For Negative Scenarios
     @When("user send a POST request to create booking with")
     public void user_send_a_POST_request_to_create_booking_with(DataTable dataTable) {
@@ -122,8 +126,8 @@ public class CreateBookingSteps {
                 .map(String::trim)
                 .toList();
 
-        System.out.println("🔍 Actual errors: " + actualErrors);
-        System.out.println("🔍 Expected errors: " + expectedTrimmed);
+        System.out.println("Actual errors: " + actualErrors);
+        System.out.println("Expected errors: " + expectedTrimmed);
 
         // Check if all expected errors are present
         for (String expected : expectedTrimmed) {
@@ -159,9 +163,7 @@ public class CreateBookingSteps {
         }
     }
 
-    /**
-     * Parse depositpaid — allows true/false, numbers, strings, or invalid data
-     */
+    // Parse depositpaid — allows true/false, numbers, strings, or invalid data
     private Object parseDeposit(String value) {
         if (isNullOrBlank(value)) return null;
 
@@ -197,9 +199,7 @@ public class CreateBookingSteps {
         return value;
     }
 
-    /**
-     * Utility to check for null, empty, or literal "null"
-     */
+    // Utility to check for null, empty, or literal "null"
     private boolean isNullOrBlank(String value) {
         return value == null || value.trim().isEmpty() || value.equalsIgnoreCase("null");
     }

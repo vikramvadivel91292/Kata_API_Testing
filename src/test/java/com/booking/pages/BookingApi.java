@@ -42,4 +42,17 @@ public class BookingApi {
                 .log().all()
                 .extract().response();
     }
+
+    public Response getBookingById(int id, String token) {
+        return given()
+                .baseUri(BASE_URL)
+                .basePath("/booking/" + id)
+                .header("Cookie", "token=" + token)
+                .when()
+                .get()
+                .then()
+                .log().all()
+                .extract()
+                .response();
+    }
 }
