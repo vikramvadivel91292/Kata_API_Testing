@@ -55,4 +55,15 @@ public class BookingApi {
                 .extract()
                 .response();
     }
+
+    public Response deleteBooking(int bookingId, String token) {
+        return given()
+                .baseUri(BASE_URL)
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .delete("/booking/" + bookingId)
+                .then()
+                .log().all()
+                .extract().response();
+    }
 }
