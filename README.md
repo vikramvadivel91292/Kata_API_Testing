@@ -28,7 +28,8 @@ Booking API → https://automationintesting.online/booking/swagger-ui/index.html
 | **JSON Schema Validator 5.5.5** | Schema validation utility          |
 | **Lombok 1.18.38**              | Reduces boilerplate code           |
 | **Jackson 2.17.2**              | JSON serialization/deserialization |
-| **JSONassert**                  | Validate JSON response content     |    
+| **JSONassert**                  | Validate JSON response content     |
+| **log4j2 2.23.1**               | Logging and debugging              |
 
 ## Folder Structure
 | Path                                           | Description                                                        |
