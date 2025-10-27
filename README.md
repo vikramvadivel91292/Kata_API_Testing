@@ -1,67 +1,133 @@
-# Kata API Testing in Java
+# API Automation Framework — Booking API (Java + Cucumber + RestAssured + TestNG)
 
-API Testing and Java Exercise: Setting up a Basic API Test Automation Framework.
+This project implements a test automation framework for RESTful APIs built on top of Java and the most widely used automation libraries.
+It supports full CRUD operations for the Booking API — including Create, Get, Update, and Delete — and demonstrates modern best practices such as BDD, reusable step definitions, schema validation, and CI/CD integration.
 
-## Objective
-The objective of this exercise is to evaluate your knowledge on API testing and Java by setting up a basic API Test Automation framework using Rest-Assured and Cucumber. You will need to create a test suite that executes a few tests against one endpoint of a hotel booking website and evaluates their responses.
+## Overview
 
-## Background
-The application under test is a simple hotel booking website where you can book a room and also send a form with a request.
+The framework follows a Behavior Driven Development (BDD) approach using Cucumber, allowing scenarios to be written in plain English for easy collaboration between technical and non-technical stakeholders.
 
-The website can be accessed at https://automationintesting.online/.
+**Base API URL:**
+🔗 https://automationintesting.online/
 
-The Swagger documentation for the two endpoints you will be testing can be found at:
+**Swagger References:**
 
-Booking endpoint: https://automationintesting.online/booking/swagger-ui/index.html  
-Optionally, you also have the Authentican endpoint: https://automationintesting.online/auth/swagger-ui/index.html
+Auth API → https://automationintesting.online/auth/swagger-ui/index.html
 
-### Swagger
-This website is an external application which is not in our control.  
-We noticed that the Swagger documentation is sometimes not available on the mentioned URL above.  
-As a backup, you can find the Swagger documentation in this repository at [src/test/resources/spec/booking.yaml](src/test/resources/spec/booking.yaml)
+Booking API → https://automationintesting.online/booking/swagger-ui/index.html
 
-The Open API Spec file is only supported in the Ultimate version of IntelliJ IDEA. But you can copy the content of the file and paste it in an online Swagger editor like https://editor.swagger.io/ to visualize the API documentation.
+## Technologies Used
 
-### Authentication
-In order to authenticate yourself, the required credentials are:
-* Username: `admin`
-* Password: `password`
+| Technology                      | Purpose                            |
+|---------------------------------|------------------------------------|
+| **Java 17**                     | Core programming language          |
+| **Maven 3.5.3**                 | Build and dependency management    |
+| **Rest Assured 5.5.2**          | API testing library                |
+| **Cucumber 7.22.2**             | BDD test framework                 |
+| **TestNG 7.10.2**               | Test execution and reporting       |
+| **JSON Schema Validator 5.5.5** | Schema validation utility          |
+| **Lombok 1.18.38**              | Reduces boilerplate code           |
+| **Jackson 2.17.2**              | JSON serialization/deserialization |
+| **JSONassert**                  | Validate JSON response content     |    
 
-## Task
-You are provided with an extremely basic API test project.
+## Folder Structure
+| Path                                           | Description                                                        |
+|------------------------------------------------|--------------------------------------------------------------------|
+| **pom.xml**                                    | Maven project configuration file                                   |
+| **README.md**                                  | Project documentation                                              |
+| **src/main/java/com/booking/pojo/**            | POJO classes (BookingRequest, BookingResponse)                     |
+| **src/main/java/com/booking/utils/**           | Utility classes (JsonUtils, ConfigReader)                          |
+| **src/test/java/com/booking/stepdefinitions/** | Cucumber step definitions (CreateBookingSteps, UpdateBookingSteps) |
+| **src/test/java/com/booking/runners/**         | Test runner files (CucumberTestNGRunner)                           |
+| **src/test/java/com/booking/hooks/**           | Common hooks (setup, teardown, token management)                   |
+| **src/test/java/com/booking/pages/**           | Contains API layer (BookingAPI, AuthAPI)                           |
+| **src/test/resources/features/**               | Contains feature files                                             |
+| **src/test/resources/schemas/**                | JSON schema validation files                                       |
+| **src/test/resources/testdata/**               | External test data (JSON/CSV)                                      |
+| **src/test/resources/config.properties**       | Environment configuration file (base URLs, tokens, timeouts, etc.) |
+| **reports/findings**                           | API issues and observations                                        |
+| **target/**                                    | Build output directory                                             |
 
-Please clone the project and create a new branch with your name. At the end, please push your branch to this project.
+## Features Covered
+| Module                 | Endpoints Covered                                                                                                                                        |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Auth Controller**    | `POST /auth` → Token generation                                                                                                                          |
+| **Booking Controller** | `POST /booking` → Create Booking<br>`GET /booking/{id}` → Get Booking<br>`PUT /booking/{id}` → Update Booking<br>`DELETE /booking/{id}` → Delete Booking |
 
-The project to start from, can be found here: https://github.com/freddyschoeters/API_Testing_kata
+## Setup Guide
 
-Your task is to set up an API Test Automation framework from this project using Java, Rest-Assured, and Cucumber (feel free to add more dependencies if required).
+1. Install Java 17 and Maven 4.0.0+
 
-It is up to you to define the test cases. You don’t need to have a full coverage, but you need to show enough variation on the types of tests that you would need to write and execute, and what to check in the response.
+2. Clone this repository
 
-This kata has the purpose to evaluate both your technical skills as well as your testing skills.
+git clone https://github.com/vikramvadivel91292/Kata_API_Testing.git
 
-`For this task, you will use the booking endpoint.`
+3. Open in your IDE (IntelliJ / Eclipse)
 
+4. Allow Maven to auto-download dependencies
 
-## Requirements
-* Use Java as the programming language
-* Use Rest-Assured as the API testing library
-* Use Cucumber as the BDD framework
-* Design your codebase using a proper Java design pattern
-* Write good tests with correct checks
-* Use Git for version control and push your codebase to an open GitHub repository
-* Make regular commits to demonstrate your progress
+5. Verify structure → src/test/resources/features and src/test/java are recognized as test sources
 
+## Running the Tests
 
-## Deliverables
-* Your branch pushed in the provided project.
-* A comprehensive test suite covering the scenarios mentioned above
-* A well-structured codebase with proper design patterns and comments
-* Regular commits demonstrating your progress
+1️⃣ Run via Feature File
 
-## Evaluation Criteria
-* Being able to successfully run the tests
-* Correctness and completeness of the test suite
-* Quality of the codebase (design patterns, structure, code quality, …)
-* Use of Rest-Assured and Cucumber features
-* Commit history and progress demonstration
+Open any .feature file under src/test/resources/features
+→ Right-click → “Run Feature File”
+
+2️⃣ Run via Maven Command
+
+Run all tests:
+
+mvn clean test
+
+Run only specific tags:
+
+mvn clean test -Dcucumber.filter.tags="@positive or @negative"
+
+## Tags Convention
+
+| Tag                                            | Purpose                                      |
+|------------------------------------------------|----------------------------------------------|
+| `@Positive`                                    | Positive test scenarios                      |
+| `@Negative`                                    | Negative test scenarios                      |
+| `@knownIssue`                                  | Test scenarios which fails with known issues |
+
+## Reporting
+
+After test execution, an HTML report is generated at:
+📄 target/cucumber-reports.html
+
+You can open it in a browser to view a detailed execution summary with steps, screenshots (if integrated), and logs.
+
+## JSON Schema Validation
+
+Each response is validated against a pre-defined schema which is present in this path:
+
+**src/test/resources/schemas/**
+
+## Scenarios Implemented
+| Feature            | Scenarios                                                                                |
+| ------------------ | ---------------------------------------------------------------------------------------- |
+| **Create Booking** | ✅ Valid booking creation (201)<br>❌ Invalid data scenarios (missing fields, wrong types) |
+| **Get Booking**    | ✅ Get by valid ID (200)<br>❌ Invalid / non-existent ID handling                          |
+| **Update Booking** | ✅ Update existing booking (200)<br>❌ Invalid ID / data validation                        |
+| **Delete Booking** | ✅ Delete by valid ID (201)<br>❌ Invalid / non-existent ID (400 / 404)                    |
+
+## Observations / Known Issues
+
+Observations are present in this path:
+
+**reports/findings**
+
+## Future Enhancements
+
+⚙️ Integration with CI/CD (Jenkins) pipeline
+
+🌐 Dynamic booking date generator
+
+🧩 Parallel execution for faster runs
+
+📊 Allure or ExtentReports integration
+
+☁️ API environment switch via config (DEV/STAGE/PROD)
