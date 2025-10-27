@@ -5,9 +5,10 @@ Feature: Create Booking
 
   @Positive
   Scenario: Successfully create a booking
-    And user have valid booking data
+    Given user have valid booking data
     When user sends POST request to create a booking
     Then user should get valid booking response with status code 201
+    And booking response should match the "CreateBooking" json schema
 
   @Negative
   Scenario Outline: Validate booking creation with invalid data

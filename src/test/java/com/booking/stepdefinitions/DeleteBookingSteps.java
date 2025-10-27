@@ -13,8 +13,8 @@ public class DeleteBookingSteps {
     private int bookingId;
     private String token;
 
-    @Given("user wants to delete booking ID {int}")
-    public void user_wants_to_delete_booking_ID(Integer id) {
+    @Given("user has a valid booking ID {int}")
+    public void user_has_a_valid_booking_ID(Integer id) {
         Assert.assertNotNull(Hooks.token, "Token should not be null");
         System.out.println("Auth Token verified: " + Hooks.token);
         bookingId = id;
@@ -36,8 +36,8 @@ public class DeleteBookingSteps {
         System.out.println("DELETE Response (Invalid Token): " + response.getBody().asString());
     }
 
-    @Then("the response status code should be {int}")
-    public void the_response_status_code_should_be(Integer expectedStatusCode) {
+    @Then("delete response status code should be {int}")
+    public void delete_response_status_code_should_be(Integer expectedStatusCode) {
         Assert.assertEquals(response.getStatusCode(), expectedStatusCode.intValue(),
                 "Unexpected status code!");
         System.out.println("Verified DELETE status code: " + response.getStatusCode());
@@ -49,8 +49,8 @@ public class DeleteBookingSteps {
         System.out.println("Booking deleted successfully for ID: " + bookingId);
     }
 
-    @Then("response should contain error message {string}")
-    public void response_should_contain_error_message(String expectedError) {
+    @Then("delete response should contain error message {string}")
+    public void delete_response_should_contain_error_message(String expectedError) {
         String actualResponse = response.getBody().asString();
         Assert.assertTrue(actualResponse.contains(expectedError),
                 "Expected error message not found! Actual response: " + actualResponse);

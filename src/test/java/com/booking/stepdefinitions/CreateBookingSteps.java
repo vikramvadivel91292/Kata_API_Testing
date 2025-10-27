@@ -9,6 +9,7 @@ import com.booking.utils.JsonUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.*;
+import io.restassured.module.jsv.JsonSchemaValidator;
 import io.restassured.response.Response;
 import org.testng.Assert;
 import java.io.IOException;
@@ -39,7 +40,9 @@ public class CreateBookingSteps {
     @When("user sends POST request to create a booking")
     public void user_sends_POST_request_to_create_a_booking() {
         bookingApi = new BookingApi();
-        bookingResponse = bookingApi.createBooking(bookingRequest, Hooks.token);
+        response = bookingApi.createBookingRaw(bookingRequest, Hooks.token);
+        // deserialize to POJO for your assertions
+        bookingResponse = response.as(BookingResponse.class);
     }
 
     @Then("user should get valid booking response with status code {int}")
@@ -69,6 +72,19 @@ public class CreateBookingSteps {
 
         // Share booking response with GetBookingSteps
         GetBookingSteps.setBookingResponse(bookingResponse);
+    }
+
+    @And("booking response should match the {string} json schema")
+    public void booking_response_should_match_the_json_schema(String schemaFileName) {
+        // Ensure response object exists (from your positive scenario)
+        Assert.assertNotNull(bookingResponse, "Booking response should not be null before schema validation");
+
+        // Use JsonSchemaValidator to check response body
+        response.then()
+                .assertThat()
+                .body(JsonSchemaValidator.matchesJsonSchemaInClasspath("schemes/" + schemaFileName + ".json"));
+
+        System.out.println("Booking response successfully validated against schema: " + schemaFileName + ".json");
     }
 
     // For Negative Scenarios
@@ -202,5 +218,50 @@ public class CreateBookingSteps {
     // Utility to check for null, empty, or literal "null"
     private boolean isNullOrBlank(String value) {
         return value == null || value.trim().isEmpty() || value.equalsIgnoreCase("null");
+    }
+
+    @When("user sends PUT request to update booking ID {int}")
+    public void user_sends_PUT_request_to_update_booking_ID(Integer id) {
+        bookingApi = new BookingApi();
+        response = bookingApi.updateBooking(id, bookingRequest, Hooks.token);
+    }
+
+    @When("user sends PUT request to update booking ID {int} with token {string}")
+    public void user_sends_PUT_request_to_update_booking_ID_with_token(Integer id, String token) {
+        bookingApi = new BookingApi();
+        response = bookingApi.updateBooking(id, bookingRequest, token);
+    }
+
+    @When("user sends PATCH request to partially update booking ID {int}")
+    public void user_sends_PATCH_request_to_partially_update_booking_ID(Integer id) {
+        bookingApi = new BookingApi();
+        response = bookingApi.partialUpdateBooking(id, bookingRequest, Hooks.token);
+    }
+
+    @When("user sends PATCH request to partially update booking ID {int} with token {string}")
+    public void user_sends_PATCH_request_to_partially_update_booking_ID_with_token(Integer id, String token) {
+        bookingApi = new BookingApi();
+        response = bookingApi.partialUpdateBooking(id, bookingRequest, token);
+    }
+
+    @When("user send a PUT request to update booking ID {int} with")
+    public void user_send_a_PUT_request_to_update_booking_ID_with(Integer id, DataTable dataTable) {
+        Map<String, String> data = dataTable.asMap(String.class, String.class);
+
+        bookingRequest = new BookingRequest();
+        bookingRequest.setRoomidRaw(parseRoomId(data.get("roomid")));
+        bookingRequest.setFirstnameRaw(parseJsonValue(data.get("firstname")));
+        bookingRequest.setLastnameRaw(parseJsonValue(data.get("lastname")));
+        bookingRequest.setDepositpaidRaw(parseDeposit(data.get("depositpaid")));
+
+        BookingDates bookingDates = new BookingDates();
+        bookingDates.setCheckin(data.get("checkin"));
+        bookingDates.setCheckout(data.get("checkout"));
+        bookingRequest.setBookingdates(bookingDates);
+        bookingRequest.setEmail(data.get("email"));
+        bookingRequest.setPhone(data.get("phone"));
+
+        bookingApi = new BookingApi();
+        response = bookingApi.updateBookingRaw(id, bookingRequest, Hooks.token);
     }
 }
