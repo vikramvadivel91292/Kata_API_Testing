@@ -7,10 +7,10 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BookingRequest {
 
-    private Object roomid;        // changed from int → Object
+    private Object roomid;
     private Object firstname;
     private Object lastname;
-    private Object depositpaid;   // changed from boolean → Object
+    private Object depositpaid;
     private BookingDates bookingdates;
     private String email;
     private String phone;

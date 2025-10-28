@@ -4,9 +4,7 @@ import com.booking.pojo.AuthRequest;
 import com.booking.pojo.AuthResponse;
 import com.booking.utils.ConfigReader;
 import io.restassured.RestAssured;
-
 import java.util.Objects;
-
 import static io.restassured.RestAssured.given;
 
 public class AuthApi {

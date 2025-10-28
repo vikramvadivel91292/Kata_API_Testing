@@ -4,6 +4,7 @@ Feature: Create Booking
     Given user have valid authentication token
 
   @Positive
+     #Need to update roomid in bookingData.json before running this test
   Scenario: Successfully create a booking
     Given user have valid booking data
     When user sends POST request to create a booking

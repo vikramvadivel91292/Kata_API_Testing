@@ -9,8 +9,8 @@ Feature: Get Booking by ID
     Then response status code should be 200
     And booking details should be returned successfully
 
-  @Positive
-    #Has to update roomid in bookingData.json before running this test
+  @Positive @knownIssue
+    #Need to update roomid in bookingData.json before running this test
   Scenario: Create a booking and retrieve it using the same ID
     Given user have valid authentication token
     Given user have valid booking data

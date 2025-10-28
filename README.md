@@ -61,7 +61,7 @@ Booking API → https://automationintesting.online/booking/swagger-ui/index.html
 
 2. Clone this repository
 
-git clone https://github.com/vikramvadivel91292/Kata_API_Testing.git
+    git clone https://github.com/vikramvadivel91292/Kata_API_Testing.git
 
 3. Open in your IDE (IntelliJ / Eclipse)
 
